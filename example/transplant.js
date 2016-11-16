@@ -19,7 +19,7 @@ class Counter extends Component {
   }
 }
 
-@connect(state => state.local)
+@connect(state => state.get('local'))
 class Debug extends Component {
   render() {
     return <div>

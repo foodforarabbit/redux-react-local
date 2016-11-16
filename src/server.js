@@ -10,7 +10,7 @@ export function stringifySafe(state) {
   return {
     ...state,
     local: {
-      $$tree: compressedTree(state.local.$$tree),
+      $$tree: compressedTree(state.get('local').$$tree),
       get: undefined,
       $$changed: undefined,
       $$fns: undefined

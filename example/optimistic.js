@@ -51,7 +51,7 @@ class Status extends Component {
 }
 
 
-let App = connect(state => state.local)(
+let App = connect(state => state.get('local'))(
 class App extends Component {
   static contextTypes = {
     optimist: PropTypes.func

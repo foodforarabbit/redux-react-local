@@ -101,7 +101,7 @@ describe('redux-react-local', () => {
             this.setState({ faux: 2 }, () =>
               this.setState({ faux: 3 }, () =>
                 this.setState({ faux: 2 }, () => {
-                  let o = T.toObject(this.props.local.$$tree)
+                  let o = T.toObject(this.props.get('local').$$tree)
                   expect(o).toEqual({
                     // these 3 persisted
                     'faux:1': 2,
@@ -174,7 +174,7 @@ describe('redux-react-local', () => {
     @connect(x => x)
     class Inner extends Component {
       render() {
-        return <div>{this.props.local.get('app')}</div>
+        return <div>{this.props.get('local').get('app')}</div>
       }
     }
 
