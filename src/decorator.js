@@ -78,12 +78,12 @@ export default function local({
         let id = getId(this.props),
           storeState = this.store.getState()
 
-        if(!storeState.local) {
+        if(!storeState.get('local')) {
           throw new Error('did you forget to include the `local` reducer?')
         }
         return {
           id,
-          value: whenUndefined(storeState.local.get(id), getInitial(this.props))
+          value: whenUndefined(storeState.get('local').get(id), getInitial(this.props))
         }
       })()
 
@@ -145,7 +145,7 @@ export default function local({
 
           this.setState({
             id,
-            value: whenUndefined(this.store.getState().local.get(id), init)
+            value: whenUndefined(this.store.getState().get('local').get(id), init)
           })
         }
       }
@@ -177,4 +177,3 @@ export default function local({
     }
   }
 }
-

@@ -29,7 +29,7 @@
     "css-loader": "^0.23.1",
     "eslint": "^2.1.0",
     "eslint-config-rackt": "^1.1.1",
-    "eslint-plugin-react": "^4.0.0",
+    "eslint-plugin-react": "^4.3.0",
     "expect": "^1.14.0",
     "expect-jsx": "^2.3.0",
     "isparta-loader": "^2.0.0",

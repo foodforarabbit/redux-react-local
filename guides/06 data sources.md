@@ -23,7 +23,7 @@ class Mouse extends Component{
   }
 }
 
-@connect(state => state.local.get('mouse'))
+@connect(state => state.get('local').get('mouse'))
 class App extends Component{
   state = {
     tracking: false
