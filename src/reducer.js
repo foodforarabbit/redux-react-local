@@ -1,9 +1,9 @@
 const identity = x => x
 import * as T from './tree'
 
-function get(key) {
+function get(key, tree = this.$$tree) {
   // todo - cache on an 'instance'
-  return T.get(this.$$tree, key)
+  return T.get(tree, key)
 }
 
 export default function localReducer(state = {
