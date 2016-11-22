@@ -1,7 +1,7 @@
 const identity = x => x
 import * as T from './tree'
 
-function get(key, tree = this.$$tree) {
+function $get(key, tree = this.$$tree) {
   // todo - cache on an 'instance'
   return T.get(tree, key)
 }
@@ -12,7 +12,7 @@ export default function localReducer(state = {
   $$changed: T.make()
 }, action) {
   // ack!
-  state.get = state.get || get
+  state.$get = state.$get || $get
   state.$$tree = state.$$tree || T.make()
   state.$$fns = state.$$fns || T.make()
   state.$$changed = state.$$changed || T.make()
@@ -29,7 +29,7 @@ export default function localReducer(state = {
 
 function flush(state) {
   return {
-    get: state.get,
+    $get: state.$get,
     $$tree: state.$$tree,
     $$fns: state.$$fns,
     $$changed: T.make()
@@ -42,7 +42,7 @@ function setState(state, { payload }) {
   }
 
   return {
-    get: state.get,
+    $get: state.$get,
     $$fns: state.$$fns,
     $$tree: T.set(state.$$tree, payload.ident, payload.state),
     $$changed: T.set(state.$$changed, payload.ident, payload.state)
@@ -60,7 +60,7 @@ function register(state, action) {
   // also makes preloading data simple
   let prevState = T.get(state.$$tree, ident)
   return {
-    get: state.get,
+    $get: state.$get,
     $$tree: prevState !== undefined ? state.$$tree : T.set(state.$$tree, ident, initial),
     $$fns: fn === reducer ? state.$$fns : T.set(state.$$fns, ident, reducer),
     $$changed:  !prevState ? state.$$changed : T.set(state.$$changed, ident,  prevState !== undefined ? prevState : initial)
@@ -82,7 +82,7 @@ function unmount(state, action) {
   let { payload: { persist, ident } } = action
   if (persist) {
     return {
-      get: state.get,
+      $get: state.$get,
       $$tree: state.$$tree,
       $$changed: state.$$changed,
       $$fns: T.set(state.$$fns, ident, identity) // we use this as a signal that it's been unmounted
@@ -90,7 +90,7 @@ function unmount(state, action) {
   }
   else {
     return {
-      get: state.get,
+      $get: state.$get,
       $$changed: state.$$changed,
       $$tree: T.del(state.$$tree, ident),
       $$fns: T.del(state.$$fns, ident)
@@ -131,7 +131,7 @@ function reduceAll(state, action) {
   }
 
   return changed.length > 0 ? {
-    get: state.get,
+    $get: state.$get,
     $$fns: state.$$fns,
     $$tree: t,
     $$changed: changed.reduce((c, [ key, value ]) => T.set(c, key, value), state.$$changed)

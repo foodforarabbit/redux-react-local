@@ -83,7 +83,7 @@ export default function local({
         }
         return {
           id,
-          value: whenUndefined(storeState.get('local').get(id), getInitial(this.props))
+          value: whenUndefined(storeState.get('local').$get(id), getInitial(this.props))
         }
       })()
 
@@ -145,7 +145,7 @@ export default function local({
 
           this.setState({
             id,
-            value: whenUndefined(this.store.getState().get('local').get(id), init)
+            value: whenUndefined(this.store.getState().get('local').$get(id), init)
           })
         }
       }
