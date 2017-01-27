@@ -139,7 +139,7 @@ export default function local({
           $={this.$}
           ident={this.state.id}
           dispatch={this.store.dispatch}
-          localState={this.state.value}
+          state={this.state.value}
           setState={this._setState}>
             {this.props.children}
         </Target>
