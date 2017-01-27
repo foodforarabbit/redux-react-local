@@ -1,4 +1,5 @@
 import React, { PropTypes, Component } from 'react'
+import * as Actions from './actions'
 
 const isBrowserLike = typeof navigator !== 'undefined'
 
@@ -87,34 +88,14 @@ export default function local({
         }
       })()
 
-      $ = action => {
-        // 'localize' an event. super convenient for making actions 'local' to this component
-        return  {
-          ...action,
-          type: `${this.state.id}:${action.type}`,
-          meta: {
-            ...action.meta || {},
-            ident: this.state.id,
-            type: action.type,
-            local: true
-          }
-        }
-      }
+      $ = Actions.$(this.state.id)
 
       _setState = state => {
-        this.store.dispatch({ type: '$$local.setState', payload: { state, ident: this.state.id } })
+        this.store.dispatch(Actions.setState(this.state.id)(state))
       }
 
       componentWillMount() {
-        this.store.dispatch({
-          type: '$$local.register',
-          payload: {
-            ident: this.state.id,
-            initial: this.state.value,
-            reducer,
-            persist
-          }
-        })
+        this.store.dispatch(Actions.register(this.state.id, this.state.value, reducer, persist)())
         if(isBrowserLike) {
           this.dispose = this.context.$$local(this.state.id, value => {
             this.setState({ value })
@@ -132,16 +113,9 @@ export default function local({
 
         if (id !== this.state.id) {
           let init = getInitial(next)
-          this.store.dispatch({
-            type: '$$local.swap',
-            payload: {
-              ident: this.state.id,
-              next: id,
-              initial: init,
-              reducer,
-              persist
-            }
-          })
+          this.store.dispatch(
+            Actions.swap(this.state.id, reducer, persist, id, init)()
+          )
 
           this.setState({
             id,
@@ -151,13 +125,9 @@ export default function local({
       }
 
       componentWillUnmount() {
-        this.store.dispatch({
-          type: '$$local.unmount',
-          payload: {
-            ident: this.state.id,
-            persist
-          }
-        })
+        this.store.dispatch(
+          Actions.unmount(this.state.id, persist)()
+        )
         if(this.dispose) {
           this.dispose()
         }
@@ -169,7 +139,7 @@ export default function local({
           $={this.$}
           ident={this.state.id}
           dispatch={this.store.dispatch}
-          state={this.state.value}
+          localState={this.state.value}
           setState={this._setState}>
             {this.props.children}
         </Target>
