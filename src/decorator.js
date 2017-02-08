@@ -32,35 +32,34 @@ function shallowEqual(objA, objB) {
   return true
 }
 
-export default function local({
-  ident,            // string / ƒ(props)
-  initial = {},     // value / ƒ(props)
-  reducer = x => x, // ƒ(state, action) => state
-  persist = true    // can swap out state on unmount
-} = {}) {
-  if (!ident) {
-    throw new Error('cannot annotate with @local without an ident')
-  }
-
-  // if (!initial) {
-  //   throw new Error('cannot annotate with @local without an initial state')
-  // }
-
-  function getId(props) {
-    if (typeof ident === 'string') {
-      return ident
-    }
-    return ident(props)
-  }
-
-  function getInitial(props) {
-    if (typeof initial !== 'function') {
-      return initial
-    }
-    return initial(props)
-  }
+export default function local({ ...config }) {
 
   return function (Target) {
+
+    const {
+      ident,            // string / ƒ(props)
+      initial = {},     // value / ƒ(props)
+      reducer = x => x, // ƒ(state, action) => state
+      persist = true    // can swap out state on unmount
+    } = { ...this.props, ...config }
+
+    if (!ident) {
+      throw new Error('cannot annotate with @local without an ident')
+    }
+
+    function getId(props) {
+      if (typeof ident === 'string') {
+        return ident
+      }
+      return ident(props)
+    }
+
+    function getInitial(props) {
+      if (typeof initial !== 'function') {
+        return initial
+      }
+      return initial(props)
+    }
 
     return class ReduxReactLocal extends Component {
       static contextTypes = {
