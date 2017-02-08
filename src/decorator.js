@@ -1,4 +1,4 @@
-import React, { PropTypes, Component } from 'react'
+import React, { PropTypes, Component } from 'react' // eslint-disable-line no-unsafe-negation, no-global-assign
 import * as Actions from './actions'
 
 const isBrowserLike = typeof navigator !== 'undefined'
@@ -32,36 +32,45 @@ function shallowEqual(objA, objB) {
   return true
 }
 
+function getId(props) {
+  if (typeof props.ident === 'string') {
+    return props.ident
+  }
+  return props.ident(props)
+}
+
+function getInitial(props) {
+  if (typeof props.initial !== 'function') {
+    return props.initial
+  }
+  return props.initial(props)
+}
+
 export default function local({ ...config }) {
-
-  return function (Target) {
-
+  const mapProps = (props) => {
     const {
       ident,            // string / ƒ(props)
       initial = {},     // value / ƒ(props)
       reducer = x => x, // ƒ(state, action) => state
-      persist = true    // can swap out state on unmount
-    } = { ...this.props, ...config }
+      persist = true,    // can swap out state on unmount
+      ...rest
+    } = { ...props, ...config }
 
     if (!ident) {
       throw new Error('cannot annotate with @local without an ident')
     }
 
-    function getId(props) {
-      if (typeof ident === 'string') {
-        return ident
-      }
-      return ident(props)
+    return {
+      ident,
+      initial,
+      reducer,
+      persist,
+      ...rest
     }
-
-    function getInitial(props) {
-      if (typeof initial !== 'function') {
-        return initial
-      }
-      return initial(props)
-    }
-
+  }
+  return function (Target) {
     return class ReduxReactLocal extends Component {
+
       static contextTypes = {
         store: PropTypes.shape({
           subscribe: PropTypes.func.isRequired,
@@ -72,10 +81,12 @@ export default function local({ ...config }) {
       }
       static displayName = 'local:' + (Target.displayName || Target.name)
 
+      mappedProps = mapProps(this.props);
+
       store = this.context.store
 
       state = (() => {
-        let id = getId(this.props),
+        let id = getId(this.mappedProps),
           storeState = this.store.getState()
 
         if(!storeState.get('local')) {
@@ -83,7 +94,7 @@ export default function local({ ...config }) {
         }
         return {
           id,
-          value: whenUndefined(storeState.get('local').$get(id), getInitial(this.props))
+          value: whenUndefined(storeState.get('local').$get(id), getInitial(this.mappedProps))
         }
       })()
 
@@ -94,7 +105,7 @@ export default function local({ ...config }) {
       }
 
       componentWillMount() {
-        this.store.dispatch(Actions.register(this.state.id, this.state.value, reducer, persist)())
+        this.store.dispatch(Actions.register(this.state.id, this.state.value, this.mappedProps.reducer, this.mappedProps.persist)())
         if(isBrowserLike) {
           this.dispose = this.context.$$local(this.state.id, value => {
             this.setState({ value })
@@ -102,7 +113,7 @@ export default function local({ ...config }) {
         }
       }
       shouldComponentUpdate(nextProps, nextState) {
-        return !shallowEqual(this.props, nextProps) ||
+        return !shallowEqual(this.mappedProps, mapProps(nextProps)) ||
           (this.state.id !== nextState.id) ||
           (this.state.value !== nextState.value)
       }
@@ -113,7 +124,7 @@ export default function local({ ...config }) {
         if (id !== this.state.id) {
           let init = getInitial(next)
           this.store.dispatch(
-            Actions.swap(this.state.id, reducer, persist, id, init)()
+            Actions.swap(this.state.id, this.mappedProps.reducer, this.mappedProps.persist, id, init)()
           )
 
           this.setState({
@@ -125,7 +136,7 @@ export default function local({ ...config }) {
 
       componentWillUnmount() {
         this.store.dispatch(
-          Actions.unmount(this.state.id, persist)()
+          Actions.unmount(this.state.id, this.mappedProps.persist)()
         )
         if(this.dispose) {
           this.dispose()
@@ -134,15 +145,16 @@ export default function local({ ...config }) {
 
       render() {
         return <Target
-          {...this.props}
+          {...this.mappedProps}
           $={this.$}
           ident={this.state.id}
           dispatch={this.store.dispatch}
           state={this.state.value}
           setState={this._setState}>
-            {this.props.children}
+            {this.mappedProps.children}
         </Target>
       }
     }
   }
+
 }
