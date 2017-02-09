@@ -47,7 +47,7 @@ function getInitial(props) {
 }
 
 export default function local({ ...config }) {
-  const mapProps = (props) => {
+  const mapProps = ({ ...props }) => {
     const {
       ident,            // string / ƒ(props)
       initial = {},     // value / ƒ(props)
@@ -113,16 +113,17 @@ export default function local({ ...config }) {
         }
       }
       shouldComponentUpdate(nextProps, nextState) {
-        return !shallowEqual(this.mappedProps, mapProps(nextProps)) ||
+        return !shallowEqual(this.props, nextProps) ||
           (this.state.id !== nextState.id) ||
           (this.state.value !== nextState.value)
       }
 
       componentWillReceiveProps(next) {
-        let id = getId(next)
+        const nextProps = mapProps(next)
+        let id = getId(nextProps)
 
         if (id !== this.state.id) {
-          let init = getInitial(next)
+          let init = getInitial(nextProps)
           this.store.dispatch(
             Actions.swap(this.state.id, this.mappedProps.reducer, this.mappedProps.persist, id, init)()
           )
@@ -145,13 +146,13 @@ export default function local({ ...config }) {
 
       render() {
         return <Target
-          {...this.mappedProps}
+          {...this.props}
           $={this.$}
           ident={this.state.id}
           dispatch={this.store.dispatch}
           state={this.state.value}
           setState={this._setState}>
-            {this.mappedProps.children}
+            {this.props.children}
         </Target>
       }
     }
