@@ -44,10 +44,10 @@
     "lodash.isplainobject": "^4.0.2",
     "mocha": "^3.2.0",
     "raf": "^3.2.0",
-    "react": "^15.4.1",
-    "react-dom": "^15.4.1",
+    "react": "16.1.1",
+    "react-dom": "16.1.1",
     "react-motion": "^0.4.2",
-    "react-redux": "^4.4.0",
+    "react-redux": "^4.4.5",
     "react-redux-optimist": "^1.0.3",
     "react-redux-saga": "^1.0.2",
     "redux": "^3.3.1",
@@ -60,5 +60,8 @@
   },
   "peerDependencies": {
     "react": "*"
+  },
+  "dependencies": {
+    "prop-types": "^15.6.0"
   }
 }
