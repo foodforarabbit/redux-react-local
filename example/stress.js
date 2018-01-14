@@ -1,5 +1,6 @@
 
-import React, { PropTypes, Component } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types';
 import { render } from 'react-dom'
 import { local } from '../src'
 import Root from './root'

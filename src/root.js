@@ -1,6 +1,9 @@
-import { Component, PropTypes } from 'react'
+
+import React, { Component } from 'react'
+import PropTypes from 'prop-types';
 
 import * as T from './tree'
+import { getLocalState } from './utils';
 
 const isBrowserLike = typeof navigator !== 'undefined'
 
@@ -25,7 +28,7 @@ export default class Root extends Component {
   componentWillMount() {
     if(isBrowserLike) {
       this.dispose = this.context.store.subscribe(() => {
-        let state = this.context.store.getState().get('local'), changed = false
+        let state = getLocalState(this.context.store.getState()), changed = false
         T.entries(state.$$changed).forEach(([ key, value ]) => {
           changed = true;
           (this.fns[key] || []).forEach(fn => fn(value))

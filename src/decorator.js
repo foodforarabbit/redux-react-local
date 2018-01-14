@@ -1,4 +1,6 @@
-import React, { PropTypes, Component } from 'react' // eslint-disable-line no-unsafe-negation, no-global-assign
+
+import React, { Component } from 'react'
+import PropTypes from 'prop-types';
 import * as Actions from './actions'
 
 const isBrowserLike = typeof navigator !== 'undefined'

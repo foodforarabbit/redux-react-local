@@ -1,7 +1,7 @@
 
 
 export function $(ident) {
-  return (action) => {
+  return (action, useLocal = true) => {
     // 'localize' an event. super convenient for making actions 'local' to this component
     return  {
       ...action,
@@ -10,7 +10,7 @@ export function $(ident) {
         ...action.meta || {},
         ident,
         type: action.type,
-        local: true
+        local: useLocal
       }
     }
   }
