@@ -120,7 +120,13 @@ function reduceAll(state, action) {
     // reduce
     let computed = reducers[key] ? reducers[key](value, $action) : value
 
-    if (computed === undefined) {
+    if (computed === undefined && value !== undefined) {
+      console.error('reduce', {
+        reducers,
+        key,
+        value,
+        $action,
+      });
       throw new Error(`did you forget to return state from the ${key} reducer?`) // eslint-disable-line no-console
     }
 
