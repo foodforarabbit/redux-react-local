@@ -8,8 +8,8 @@ import { getLocalState } from './utils';
 const isBrowserLike = typeof navigator !== 'undefined'
 
 export default class Root extends Component {
-  static contextTypes = {
-    store: PropTypes.object
+  static propTypes = {
+    store: PropTypes.object.isRequired
   }
   static childContextTypes = {
     $$local: PropTypes.func
@@ -27,14 +27,14 @@ export default class Root extends Component {
   }
   componentWillMount() {
     if(isBrowserLike) {
-      this.dispose = this.context.store.subscribe(() => {
-        let state = getLocalState(this.context.store.getState()), changed = false
+      this.dispose = this.props.store.subscribe(() => {
+        let state = getLocalState(this.props.store.getState()), changed = false
         T.entries(state.$$changed).forEach(([ key, value ]) => {
           changed = true;
           (this.fns[key] || []).forEach(fn => fn(value))
         })
         if(changed) {
-          this.context.store.dispatch({ type: '$$local.flushed' })
+          this.props.store.dispatch({ type: '$$local.flushed' })
         }
 
       })
