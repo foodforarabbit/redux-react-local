@@ -12,11 +12,17 @@ export default class Root extends Component {
     store: PropTypes.object.isRequired
   }
   static childContextTypes = {
-    $$local: PropTypes.func
+    $$local: PropTypes.func,
+    store: PropTypes.shape({
+      subscribe: PropTypes.func.isRequired,
+      dispatch: PropTypes.func.isRequired,
+      getState: PropTypes.func.isRequired
+    }),
   }
   getChildContext() {
     return {
-      $$local: this._local
+      $$local: this._local,
+      store: this.props.store,
     }
   }
 
@@ -25,7 +31,7 @@ export default class Root extends Component {
     this.fns[ident] = [ ...this.fns[ident] || [], fn ]
     return () => this.fns[ident] = this.fns[ident].filter(x => x!== fn)
   }
-  componentWillMount() {
+  componentDidMount() {
     if(isBrowserLike) {
       this.dispose = this.props.store.subscribe(() => {
         let state = getLocalState(this.props.store.getState()), changed = false
